@@ -16,6 +16,8 @@ describe('Pointer', () => {
                 center={10}
                 color="red"
                 className="someClassName"
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()
@@ -32,13 +34,15 @@ describe('Pointer', () => {
                 center={10}
                 color="red"
                 className="someClassName"
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()
     })
 
     it('renders correct with a child as pointer', () => {
-        const CustomPointer = ({ width }) => <circle r={width} />
+        const CustomPointer = ({ width }: { width:number }) => <circle r={`${width}`} />
         const component = shallow(
             <Pointer
                 width={5}
@@ -49,8 +53,10 @@ describe('Pointer', () => {
                 center={10}
                 color="red"
                 className="someClassName"
+                value={0}
+                size={10}
             >
-                <CustomPointer />
+                <CustomPointer width={0} />
             </Pointer>
         )
         expect(component).toMatchSnapshot()

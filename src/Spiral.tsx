@@ -1,13 +1,14 @@
 import React from 'react'
+import type { PropsWithKnobState } from 'types'
 
-const pointOnCircle = (center, radius, angle) => ({
+const pointOnCircle = (center: number, radius: number, angle: number) => ({
     x: center + radius * Math.cos(angle),
     y: center + radius * Math.sin(angle),
 })
 
-const degTorad = deg => (Math.PI * deg) / 180
+const degTorad = (deg: number) => (Math.PI * deg) / 180
 
-function ordered(v1, p1, v2, p2) {
+function ordered(v1: number, p1: number, v2: number, p2: number) {
     if (v1 <= v2) {
         return [v1, p1, v2, p2]
     } else {
@@ -24,6 +25,15 @@ const calcPath = ({
     outerRadiusFrom,
     outerRadiusTo,
     center,
+}: {
+    percentageFrom: number;
+    percentageTo: number;
+    angleOffset: number;
+    angleRange: number;
+    arcWidth: number;
+    outerRadiusFrom: number;
+    outerRadiusTo: number;
+    center: number;
 }) => {
     const [percentageMin, outerRadiusMin, percentageMax, outerRadiusMax] = 
 		ordered(percentageFrom, outerRadiusFrom, percentageTo, outerRadiusTo)
@@ -59,15 +69,24 @@ const calcPath = ({
     return `M ${start}A ${forth}L ${link}A ${back}z`
 }
 
+interface Props {
+    color: string;
+    percentageFrom?: number | null;
+    radiusFrom?: number | null;
+    percentageTo?: number | null;
+    radiusTo?: number | null;
+    arcWidth: number;
+}
+
 export const Spiral = ({
     color,
-    percentage=null,
+    percentage,
     percentageFrom=null,
     radiusFrom=null,
     percentageTo=null,
     radiusTo=null,
     ...props
-}) => {
+}: PropsWithKnobState<Props>) => {
     let pfrom, pto
     if (percentageFrom !== null && percentageTo !== null) {
         pfrom = percentageFrom
@@ -81,6 +100,12 @@ export const Spiral = ({
     } else {
         pfrom = 0
         pto = percentage
+    }
+    if (radiusFrom === null || radiusTo === null) {
+        return <></>
+    }
+    if (pfrom === null || pto === null) {
+        return <></>
     }
     const d = calcPath({
 		percentageFrom: pfrom,

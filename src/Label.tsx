@@ -1,11 +1,21 @@
 import React from 'react'
+import type { PropsWithKnobState } from 'types';
 
-const pointOnCircle = (center, radius, angle) => {
+const pointOnCircle = (center: number, radius: number, angle: number) => {
     const rad = angle * Math.PI / 180
     return {
         x: center + radius * Math.cos(rad),
         y: center + radius * Math.sin(rad),
     }
+}
+
+interface Props {
+    label: string;
+    size:number;
+    decimalPlace:number;
+    className:string;
+    style: Record<string, any>;
+    userSelect?: "auto" | "text" | "none" | "contain" | "all";
 }
 
 export const Label = ({
@@ -18,9 +28,9 @@ export const Label = ({
     className,
     style = {},
     userSelect = "none",
-}) => {
-    if (!label) {
-        return null
+}: PropsWithKnobState<Props>) => {
+    if (!label || percentage === null) {
+        return <></>
     }
     const angle = angleOffset + 90 + angleRange * percentage
     const p = pointOnCircle(center, radius, angle)
@@ -34,7 +44,6 @@ export const Label = ({
                 textAnchor="middle"
                 className={className}
                 dominantBaseline="middle"
-                textAnchor="middle"
             >
                 {label}
             </text>

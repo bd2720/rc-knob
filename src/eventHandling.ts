@@ -1,12 +1,24 @@
-const DIRECTIONS = {
+import type { KeyboardEvent } from "react";
+import type { InteractiveHook, InteractiveHookResult } from "types";
+
+type Dispatch = (props: {type: string, direction?: number}) => void;
+
+interface MousePosition {
+    mouseX: number;
+    mouseY: number;
+    mouseRadius: number;
+    mouseAngle: number;
+}
+
+const DIRECTIONS: Record<number, number> = {
     37: -1,
     38: 1,
     39: 1,
     40: -1,
 }
 
-export const onKeyDown = dispatch => e => {
-    const direction = DIRECTIONS[e.keyCode]
+export const onKeyDown = (dispatch:Dispatch) => (e: KeyboardEvent<HTMLDivElement>) => {
+    const direction: number = DIRECTIONS[e.keyCode] ?? 0
     if (!direction) {
         return
     } else {
@@ -18,7 +30,7 @@ export const onKeyDown = dispatch => e => {
     }
 }
 
-export const onScroll = dispatch => e => {
+export const onScroll = (dispatch:Dispatch) => (e: WheelEvent) => {
     const direction =
         e.deltaX < 0 || e.deltaY > 0 ? 1 : e.deltaX > 0 || e.deltaY < 0 ? -1 : 0
 
@@ -29,7 +41,7 @@ export const onScroll = dispatch => e => {
     })
 }
 
-const getClientCenter = (elem) => {
+const getClientCenter = (elem: HTMLElement) => {
     const rect = elem.getBoundingClientRect()
     return {
         centerX: rect.x + elem.clientWidth / 2,
@@ -41,7 +53,7 @@ const getClientCenter = (elem) => {
  * Compute mouse position relative to the elem center
  * and a polar position with angle in degree and radius
  */
-const getMousePosition = (elem, e) => {
+const getMousePosition = (elem: HTMLElement, e: PointerEvent | MouseEvent): MousePosition => {
     const {centerX, centerY} = getClientCenter(elem)
 
     const mouseX = e.clientX - centerX
@@ -57,15 +69,16 @@ const getMousePosition = (elem, e) => {
     }
 }
 
-export const handleEventListener = ({ container, dispatch, readOnly, useMouseWheel, interactiveHook }) => () => {
+export const handleEventListener = ({ container, dispatch, readOnly, useMouseWheel, interactiveHook }:
+    { container: React.RefObject<HTMLDivElement>, dispatch: Dispatch, readOnly:boolean, useMouseWheel:boolean, interactiveHook?: InteractiveHook }) => () => {
     if (readOnly) {
         return
     }
 
-    const div = container.current
+    const div = container.current as HTMLDivElement
     const events = Object()
 
-    const getInteractiveConfig = (mousePosition, e) => {
+    const getInteractiveConfig = (mousePosition: MousePosition, e: PointerEvent| MouseEvent): InteractiveHookResult => {
         let userConfig = {}
         if (interactiveHook) {
             const event = {
@@ -80,8 +93,9 @@ export const handleEventListener = ({ container, dispatch, readOnly, useMouseWhe
         return userConfig
     }
 
-    const onStart = e => {
-        if (e.pointerType === "mouse" && e.button !== 0) {
+    const onStart = (e: PointerEvent | MouseEvent) => {
+        // FIXME: remove the as
+        if ((e as PointerEvent).pointerType === "mouse" && e.button !== 0) {
             return
         }
         const mousePosition = getMousePosition(div, e)
@@ -92,7 +106,8 @@ export const handleEventListener = ({ container, dispatch, readOnly, useMouseWhe
         e.preventDefault()
         e.stopPropagation()
         if (window.PointerEvent) {
-            events.capturedPointerId = e.pointerId
+            // FIXME: remove the as
+            events.capturedPointerId = (e as PointerEvent).pointerId
             div.setPointerCapture(events.capturedPointerId)
             div.addEventListener('pointermove', onMove)
             div.addEventListener('pointerup', onStop)
@@ -125,7 +140,7 @@ export const handleEventListener = ({ container, dispatch, readOnly, useMouseWhe
             events.capturedContextMenu = false
         }
     }
-    const onMove = e => {
+    const onMove = (e: PointerEvent| MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
         const mousePosition = getMousePosition(div, e)
@@ -143,7 +158,7 @@ export const handleEventListener = ({ container, dispatch, readOnly, useMouseWhe
         clearCapture()
         dispatch({ type: 'CANCEL' })
     }
-    const onContextMenu = e => {
+    const onContextMenu = (e: Event) => {
         e.preventDefault()
         e.stopPropagation()
         clearCapture()

@@ -1,12 +1,13 @@
 import React from 'react'
+import type { KnobState, PropsWithKnobState } from 'types'
 
-const pointOnCircle = (center, radius, angle) => ({
+const pointOnCircle = (center: number, radius: number, angle: number) => ({
     x: center + radius * Math.cos(angle),
     y: center + radius * Math.sin(angle),
 })
-const degTorad = deg => (Math.PI * deg) / 180
+const degTorad = (deg: number) => (Math.PI * deg) / 180
 
-const clampDeg = deg => (deg >= 360) ? 359.999 : (deg <= -360 ? -359.999 : deg)
+const clampDeg = (deg: number) => (deg >= 360) ? 359.999 : (deg <= -360 ? -359.999 : deg)
 
 const calcPath = ({
     percentageFrom,
@@ -16,6 +17,14 @@ const calcPath = ({
     arcWidth,
     radius: outerRadius,
     center,
+}: {
+    percentageFrom: number;
+    percentageTo: number;
+    angleOffset: number;
+    angleRange: number;
+    arcWidth: number;
+    radius: number;
+    center: number;
 }) => {
     const angle = angleRange * (percentageTo - percentageFrom)
     const clampedAngle = clampDeg(angle)
@@ -40,14 +49,24 @@ const calcPath = ({
     } L${p1.x},${p1.y}`
 }
 
+interface Props {
+    color: string;
+    arcWidth: number;
+    percentageFrom: number | null;
+    percentageTo: number | null;
+    radius?: number;
+    outerRadius?: number;
+};
+
 export const Range = ({
     color,
-    percentage=null,
+    percentage,
     percentageFrom=null,
     percentageTo=null,
     ...props
-}) => {
-    let pfrom, pto
+}: PropsWithKnobState<Props>) => {
+    let pfrom: number | null;
+    let pto: number | null;
     if (percentageFrom !== null && percentageTo !== null) {
         pfrom = percentageFrom
         pto = percentageTo
@@ -61,7 +80,10 @@ export const Range = ({
         pfrom = 0
         pto = percentage
     }
-    const d = calcPath({percentageFrom:pfrom, percentageTo:pto, ...props})
+    if (pfrom === null || pto === null) {
+        return <></>
+    }
+    const d = calcPath({...props, percentageFrom:pfrom, percentageTo:pto})
     return (<g>
         <path d={d} style={{ fill: color }} />
     </g>)

@@ -6,6 +6,8 @@ describe('Arc', () => {
     it('renders with less than 1 turn', () => {
         const component = shallow(
             <Spiral
+                radius={10}
+                percentage={0}
                 color="lime"
                 center={100}
                 angleOffset={0}
@@ -15,6 +17,8 @@ describe('Arc', () => {
 				radiusFrom={100}
 				percentageTo={5}
 				radiusTo={50}
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()
@@ -22,6 +26,8 @@ describe('Arc', () => {
     it('renders with more than 1 turn', () => {
         const component = shallow(
             <Spiral
+                radius={10}
+                percentage={0}
                 color="lime"
                 center={100}
                 angleOffset={0}
@@ -31,6 +37,8 @@ describe('Arc', () => {
 				radiusFrom={100}
 				percentageTo={0.8}
 				radiusTo={50}
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()

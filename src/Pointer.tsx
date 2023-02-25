@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { isValidElement } from 'react'
+import type { PropsWithKnobState } from 'types'
 
 
-const PointerShape = ({ type, width, height, color, className }) => {
+const PointerShape = ({ type, width, height, color, className }:
+	{type:string, width:number, height:number, color:string, className:string}) => {
 	switch (type) {
 		case 'rect':
 			return (<rect
@@ -25,8 +27,17 @@ const PointerShape = ({ type, width, height, color, className }) => {
 				className={className}
 			/>)
 	}
+	return <></>
 }
 
+interface Props {
+	width: number;
+	height?: number;
+	useRotation?: boolean;
+	type?: string;
+	color: string;
+	className:string;
+}
 
 export const Pointer = ({
 	children,
@@ -41,7 +52,10 @@ export const Pointer = ({
 	type,
 	color,
 	className,
-}) => {
+}: React.PropsWithChildren<PropsWithKnobState<Props>>) => {
+	if (percentage === null) {
+		return <></>
+	}
 	let transform
 	if (useRotation) {
 		transform = `rotate(${angleOffset + angleRange * percentage} ${center} ${center})
@@ -57,13 +71,17 @@ export const Pointer = ({
 		transform={transform}
 	>
 		{children &&
-			React.Children.map(children, child =>
-				React.cloneElement(child, {
-					width: (width || 0),
-					height: (height || 0),
+			React.Children.map(children, child => {
+				if (!isValidElement(child)) {
+					return child;
+				}
+				return React.cloneElement(child, {
+					// @ts-expect-error
+					width: (width ?? 0),
+					height: (height ?? 0),
 					percentage,
 				})
-			)}
+			})}
 		{type && (<PointerShape
 			type={type}
 			width={width}

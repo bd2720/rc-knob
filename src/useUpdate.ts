@@ -10,12 +10,51 @@ import {
     onKeyDown,
     handleEventListener,
 } from './eventHandling'
+import type { Action, Callbacks } from 'types'
 
-const reduceOnStart = (state, action, callbacks) => {
+interface InternalState {
+    min: number;
+    max: number;
+    value: number | null;
+    isActive: boolean;
+    startPercentage?: number;
+    startValue?: number;
+    tracking: boolean;
+    angleOffset: number;
+    angleRange: number;
+    updated?: boolean;
+    mouseAngle: number | null;
+    percentage: number | null;
+    multiRotation: boolean;
+    size: number;
+    steps?: number;
+    svg: any;
+    container: any;
+}
+
+interface KnobConfiguration extends Callbacks {
+    min: number;
+    max: number;
+    multiRotation: boolean;
+    initialValue?: number | null;
+    angleOffset: number;
+    angleRange: number;
+    size: number;
+    steps?: number;
+    readOnly: boolean;
+    tracking: boolean;
+    useMouseWheel: boolean;
+}
+
+const reduceOnStart = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
+    const mouseAngle = state.mouseAngle as number
+    const percentage = state.percentage as number
     const position = calculatePositionFromMouseAngle({
         previousMouseAngle: null,
         previousPercentage: null,
         ...state,
+        mouseAngle: mouseAngle,
+        percentage: percentage,
         ...action,
     })
     const steps = action.steps || state.steps
@@ -30,18 +69,21 @@ const reduceOnStart = (state, action, callbacks) => {
         ...state,
         isActive: true,
         ...position2,
-        startPercentage: state.percentage,
-        startValue: state.value,
+        startPercentage: state.percentage as number,
+        startValue: state.value as number,
         value
     }
 }
 
-
-const reduceOnMove = (state, action, callbacks) => {
+const reduceOnMove = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
+    const mouseAngle = state.mouseAngle as number
+    const percentage = state.percentage as number
     const position = calculatePositionFromMouseAngle({
         previousMouseAngle: state.mouseAngle,
         previousPercentage: state.percentage,
         ...state,
+        mouseAngle: mouseAngle,
+        percentage: percentage,
         ...action,
     })
     const steps = action.steps || state.steps
@@ -58,9 +100,11 @@ const reduceOnMove = (state, action, callbacks) => {
     }
 }
 
-const reduceOnStop = (state, action, callbacks) => {
-    if (!state.tracking) {
-        callbacks.onChange(state.value)
+const reduceOnStop = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
+    if (state.value !== null) {
+        if (!state.tracking) {
+            callbacks.onChange(state.value)
+        }
     }
     callbacks.onEnd()
     return {
@@ -72,9 +116,9 @@ const reduceOnStop = (state, action, callbacks) => {
     }
 }
 
-const reduceOnCancel = (state, action, callbacks) => {
-    const percentage = state.startPercentage
-    const value = state.startValue
+const reduceOnCancel = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
+    const percentage = state.startPercentage as number
+    const value = state.startValue as number
     callbacks.onEnd()
     if (state.tracking) {
         callbacks.onChange(value)
@@ -86,7 +130,13 @@ const reduceOnCancel = (state, action, callbacks) => {
     }
 }
 
-const reduceOnSteps = (state, action, callbacks) => {
+const reduceOnSteps = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
+    if (action.direction === undefined) {
+        throw Error("Missing direction from Steps action");
+    }
+    if (state.value === null) {
+        return state
+    }
     const value = clamp(
         state.min,
         state.max,
@@ -100,7 +150,7 @@ const reduceOnSteps = (state, action, callbacks) => {
     }
 }
 
-const reducer = (callbacks) => (state, action) => {
+const reducer = (callbacks: Callbacks) => (state: InternalState, action: Action): InternalState => {
     switch (action.type) {
         case 'START':
             return reduceOnStart(state, action, callbacks)
@@ -134,9 +184,9 @@ export default ({
     readOnly,
     tracking,
     useMouseWheel,
-}) => {
-    const svg = useRef()
-    const container = useRef()
+}: KnobConfiguration) => {
+    const svg = useRef<SVGSVGElement>(null)
+    const container = useRef<HTMLDivElement>(null)
     const callbacks = {
 	    onChange,
         onInteractiveChange,
