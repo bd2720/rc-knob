@@ -1,15 +1,20 @@
-import React from 'react'
-import type { PropsWithKnobState } from 'types'
-import { Range } from './Range'
+import React from 'react';
+import type { PropsWithKnobState } from 'types';
+import { Range } from './Range';
 
 interface Props {
     percentage: number;
-    color:string;
-    background:string;
+    color: string;
+    background: string;
     arcWidth: number;
 }
 
-export const Arc = ({ percentage, color, background, ...props }: PropsWithKnobState<Props>) => (
+export const Arc = ({
+    percentage,
+    color,
+    background,
+    ...props
+}: PropsWithKnobState<Props>) => (
     <g>
         {background && (
             <Range
@@ -17,7 +22,7 @@ export const Arc = ({ percentage, color, background, ...props }: PropsWithKnobSt
                 percentageFrom={percentage}
                 percentageTo={1}
                 color={background}
-                { ...props }
+                {...props}
             />
         )}
         <Range
@@ -25,7 +30,7 @@ export const Arc = ({ percentage, color, background, ...props }: PropsWithKnobSt
             percentageFrom={0}
             percentageTo={percentage}
             color={color}
-            { ...props }
+            {...props}
         />
     </g>
-)
+);

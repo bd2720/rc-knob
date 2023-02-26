@@ -12,7 +12,7 @@ export interface KnobState {
     steps?: number;
 }
 
-export type PropsWithKnobState<P> = P & KnobState
+export type PropsWithKnobState<P> = P & KnobState;
 
 export interface Action {
     type: string;
@@ -34,14 +34,16 @@ export interface InteractiveHookResult {
 }
 
 export interface InteractiveHookEvent {
-    ctrlKey: boolean,
-    altKey: boolean,
-    metaKey: boolean,
-    shiftKey: boolean,
+    ctrlKey: boolean;
+    altKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
     mouseX: number;
     mouseY: number;
     mouseRadius: number;
     mouseAngle: number;
 }
 
-export type InteractiveHook = (event: InteractiveHookEvent) => InteractiveHookResult;
+export type InteractiveHook = (
+    event: InteractiveHookEvent,
+) => InteractiveHookResult;

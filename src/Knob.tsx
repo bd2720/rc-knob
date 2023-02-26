@@ -1,16 +1,22 @@
-import React, { isValidElement, KeyboardEventHandler } from 'react'
-import useUpdate from './useUpdate'
-import { Arc } from './Arc'
-import { Pointer } from './Pointer'
-import { Scale } from './Scale'
-import { Value } from './Value'
-import { Range } from './Range'
-import { Spiral } from './Spiral'
-import { Label } from './Label'
-import type { InteractiveHook } from 'types'
+import React, { isValidElement, KeyboardEventHandler } from 'react';
+import useUpdate from './useUpdate';
+import { Arc } from './Arc';
+import { Pointer } from './Pointer';
+import { Scale } from './Scale';
+import { Value } from './Value';
+import { Range } from './Range';
+import { Spiral } from './Spiral';
+import { Label } from './Label';
+import type { InteractiveHook } from 'types';
 
-const isInternalComponent = ({type}:{ type: any }) =>
-    type === Arc || type === Pointer || type === Scale || type === Value || type === Range || type === Spiral || type === Label
+const isInternalComponent = ({ type }: { type: any }) =>
+    type === Arc ||
+    type === Pointer ||
+    type === Scale ||
+    type === Value ||
+    type === Range ||
+    type === Spiral ||
+    type === Label;
 
 interface Props {
     min: number;
@@ -59,13 +65,7 @@ export const Knob = ({
     ariaLabelledBy,
     className,
 }: React.PropsWithChildren<Props>) => {
-    const {
-        percentage,
-        value,
-        svg,
-        container,
-        onKeyDown,
-    } = useUpdate({
+    const { percentage, value, svg, container, onKeyDown } = useUpdate({
         min,
         max,
         multiRotation,
@@ -82,7 +82,7 @@ export const Knob = ({
         tracking,
         onStart,
         onEnd,
-    })
+    });
 
     return (
         <div
@@ -99,7 +99,7 @@ export const Knob = ({
             className={className}
         >
             <svg width={size} height={size} ref={svg}>
-                {React.Children.map(children, child => {
+                {React.Children.map(children, (child) => {
                     if (!isValidElement(child)) {
                         return child;
                     }
@@ -115,9 +115,9 @@ export const Knob = ({
                               steps,
                               ...child.props,
                           })
-                        : child
+                        : child;
                 })}
             </svg>
         </div>
-    )
-}
+    );
+};

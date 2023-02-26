@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import type { PropsWithKnobState } from 'types';
 
 interface Props {
@@ -15,12 +15,12 @@ export const Value = ({
     marginBottom = 0,
 }: PropsWithKnobState<Props>) => {
     if (value === null || value === undefined) {
-        return <></>
+        return <></>;
     }
-    let label = value.toFixed(decimalPlace)
+    let label = value.toFixed(decimalPlace);
     // make sure no negative zero is displayed
-    if (label.startsWith("-") && Number.parseFloat(label) === 0) {
-        label = label.slice(1)
+    if (label.startsWith('-') && Number.parseFloat(label) === 0) {
+        label = label.slice(1);
     }
     return (
         <text
@@ -32,5 +32,5 @@ export const Value = ({
         >
             {label}
         </text>
-    )
-}
+    );
+};

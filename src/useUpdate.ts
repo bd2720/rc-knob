@@ -1,16 +1,13 @@
-import { useReducer, useEffect, useRef } from 'react'
+import { useReducer, useEffect, useRef } from 'react';
 import {
     calculatePositionFromMouseAngle,
     getValueFromPercentage,
     clamp,
     getPercentageFromValue,
     snapPosition,
-} from './utils'
-import {
-    onKeyDown,
-    handleEventListener,
-} from './eventHandling'
-import type { Action, Callbacks } from 'types'
+} from './utils';
+import { onKeyDown, handleEventListener } from './eventHandling';
+import type { Action, Callbacks } from 'types';
 
 interface InternalState {
     min: number;
@@ -46,9 +43,13 @@ interface KnobConfiguration extends Callbacks {
     useMouseWheel: boolean;
 }
 
-const reduceOnStart = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
-    const mouseAngle = state.mouseAngle as number
-    const percentage = state.percentage as number
+const reduceOnStart = (
+    state: InternalState,
+    action: Action,
+    callbacks: Callbacks,
+): InternalState => {
+    const mouseAngle = state.mouseAngle as number;
+    const percentage = state.percentage as number;
     const position = calculatePositionFromMouseAngle({
         previousMouseAngle: null,
         previousPercentage: null,
@@ -56,14 +57,14 @@ const reduceOnStart = (state: InternalState, action: Action, callbacks: Callback
         mouseAngle: mouseAngle,
         percentage: percentage,
         ...action,
-    })
-    const steps = action.steps || state.steps
-    const position2 = snapPosition(position, state, steps)
-    const value = getValueFromPercentage({ ...state, ...position2 })
-    callbacks.onStart()
-    callbacks.onInteractiveChange(value)
+    });
+    const steps = action.steps || state.steps;
+    const position2 = snapPosition(position, state, steps);
+    const value = getValueFromPercentage({ ...state, ...position2 });
+    callbacks.onStart();
+    callbacks.onInteractiveChange(value);
     if (state.tracking) {
-        callbacks.onChange(value)
+        callbacks.onChange(value);
     }
     return {
         ...state,
@@ -71,13 +72,17 @@ const reduceOnStart = (state: InternalState, action: Action, callbacks: Callback
         ...position2,
         startPercentage: state.percentage as number,
         startValue: state.value as number,
-        value
-    }
-}
+        value,
+    };
+};
 
-const reduceOnMove = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
-    const mouseAngle = state.mouseAngle as number
-    const percentage = state.percentage as number
+const reduceOnMove = (
+    state: InternalState,
+    action: Action,
+    callbacks: Callbacks,
+): InternalState => {
+    const mouseAngle = state.mouseAngle as number;
+    const percentage = state.percentage as number;
     const position = calculatePositionFromMouseAngle({
         previousMouseAngle: state.mouseAngle,
         previousPercentage: state.percentage,
@@ -85,87 +90,105 @@ const reduceOnMove = (state: InternalState, action: Action, callbacks: Callbacks
         mouseAngle: mouseAngle,
         percentage: percentage,
         ...action,
-    })
-    const steps = action.steps || state.steps
-    const position2 = snapPosition(position, state, steps)
-    const value = getValueFromPercentage({ ...state, ...position2 })
-    callbacks.onInteractiveChange(value)
+    });
+    const steps = action.steps || state.steps;
+    const position2 = snapPosition(position, state, steps);
+    const value = getValueFromPercentage({ ...state, ...position2 });
+    callbacks.onInteractiveChange(value);
     if (state.tracking) {
-        callbacks.onChange(value)
+        callbacks.onChange(value);
     }
     return {
         ...state,
         ...position2,
         value,
-    }
-}
+    };
+};
 
-const reduceOnStop = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
+const reduceOnStop = (
+    state: InternalState,
+    action: Action,
+    callbacks: Callbacks,
+): InternalState => {
     if (state.value !== null) {
         if (!state.tracking) {
-            callbacks.onChange(state.value)
+            callbacks.onChange(state.value);
         }
     }
-    callbacks.onEnd()
+    callbacks.onEnd();
     return {
-        ...state, isActive: false,
+        ...state,
+        isActive: false,
         value: state.value,
         percentage: state.percentage,
         startPercentage: undefined,
         startValue: undefined,
-    }
-}
+    };
+};
 
-const reduceOnCancel = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
-    const percentage = state.startPercentage as number
-    const value = state.startValue as number
-    callbacks.onEnd()
+const reduceOnCancel = (
+    state: InternalState,
+    action: Action,
+    callbacks: Callbacks,
+): InternalState => {
+    const percentage = state.startPercentage as number;
+    const value = state.startValue as number;
+    callbacks.onEnd();
     if (state.tracking) {
-        callbacks.onChange(value)
+        callbacks.onChange(value);
     }
     return {
-        ...state, isActive: false, value, percentage,
+        ...state,
+        isActive: false,
+        value,
+        percentage,
         startPercentage: undefined,
         startValue: undefined,
-    }
-}
+    };
+};
 
-const reduceOnSteps = (state: InternalState, action: Action, callbacks: Callbacks): InternalState => {
+const reduceOnSteps = (
+    state: InternalState,
+    action: Action,
+    callbacks: Callbacks,
+): InternalState => {
     if (action.direction === undefined) {
-        throw Error("Missing direction from Steps action");
+        throw Error('Missing direction from Steps action');
     }
     if (state.value === null) {
-        return state
+        return state;
     }
     const value = clamp(
         state.min,
         state.max,
-        state.value + 1 * action.direction
-    )
-    callbacks.onChange(value)
+        state.value + 1 * action.direction,
+    );
+    callbacks.onChange(value);
     return {
         ...state,
         value,
         percentage: getPercentageFromValue({ ...state, value }),
-    }
-}
+    };
+};
 
-const reducer = (callbacks: Callbacks) => (state: InternalState, action: Action): InternalState => {
-    switch (action.type) {
-        case 'START':
-            return reduceOnStart(state, action, callbacks)
-        case 'MOVE':
-            return reduceOnMove(state, action, callbacks)
-        case 'STOP':
-            return reduceOnStop(state, action, callbacks)
-        case 'CANCEL':
-            return reduceOnCancel(state, action, callbacks)
-        case 'STEPS':
-            return reduceOnSteps(state, action, callbacks)
-        default:
-            return { ...state, isActive: false, value: state.value }
-    }
-}
+const reducer =
+    (callbacks: Callbacks) =>
+    (state: InternalState, action: Action): InternalState => {
+        switch (action.type) {
+            case 'START':
+                return reduceOnStart(state, action, callbacks);
+            case 'MOVE':
+                return reduceOnMove(state, action, callbacks);
+            case 'STOP':
+                return reduceOnStop(state, action, callbacks);
+            case 'CANCEL':
+                return reduceOnCancel(state, action, callbacks);
+            case 'STEPS':
+                return reduceOnSteps(state, action, callbacks);
+            default:
+                return { ...state, isActive: false, value: state.value };
+        }
+    };
 
 export default ({
     min,
@@ -185,38 +208,41 @@ export default ({
     tracking,
     useMouseWheel,
 }: KnobConfiguration) => {
-    const svg = useRef<SVGSVGElement>(null)
-    const container = useRef<HTMLDivElement>(null)
+    const svg = useRef<SVGSVGElement>(null);
+    const container = useRef<HTMLDivElement>(null);
     const callbacks = {
-	    onChange,
+        onChange,
         onInteractiveChange,
         onStart,
         onEnd,
-    }
-    const [{ percentage, value }, dispatch] = useReducer(
-        reducer(callbacks),
-        {
-            isActive: false,
-            min,
-            max,
-            multiRotation,
-            angleOffset,
-            angleRange,
-            mouseAngle: null,
-            percentage: initialValue ? (initialValue - min) / (max - min) : 0,
-            value: initialValue || 0,
-            svg,
-            tracking,
-            container,
-            size,
-            steps,
-        }
-    )
+    };
+    const [{ percentage, value }, dispatch] = useReducer(reducer(callbacks), {
+        isActive: false,
+        min,
+        max,
+        multiRotation,
+        angleOffset,
+        angleRange,
+        mouseAngle: null,
+        percentage: initialValue ? (initialValue - min) / (max - min) : 0,
+        value: initialValue || 0,
+        svg,
+        tracking,
+        container,
+        size,
+        steps,
+    });
 
-    useEffect(handleEventListener(
-        { container, dispatch, readOnly, useMouseWheel, interactiveHook }),
-        [useMouseWheel, readOnly]
-    )
+    useEffect(
+        handleEventListener({
+            container,
+            dispatch,
+            readOnly,
+            useMouseWheel,
+            interactiveHook,
+        }),
+        [useMouseWheel, readOnly],
+    );
 
     return {
         svg,
@@ -224,5 +250,5 @@ export default ({
         percentage: percentage,
         value: value,
         onKeyDown: onKeyDown(dispatch),
-    }
-}
+    };
+};

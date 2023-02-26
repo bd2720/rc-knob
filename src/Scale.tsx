@@ -1,5 +1,5 @@
-import React from 'react'
-import type { PropsWithKnobState } from 'types'
+import React from 'react';
+import type { PropsWithKnobState } from 'types';
 
 interface RenderProps {
     translateX: number;
@@ -14,76 +14,87 @@ interface RenderProps {
     activeClassName: string;
 }
 
-
-const renderCircle = ({
-    tickWidth,
-    translateX,
-    translateY,
-    angleOffset,
-    stepSize,
-    center,
-    color,
-    active,
-    activeColor,
-    activeClassName,
-    className,
-}: RenderProps & {tickWidth: number}) => (_: any, i: number) => (
-    <circle
-        r={tickWidth}
-        key={i}
-        className={i === active ? activeClassName : className}
-        fill={i === active ? activeColor : color}
-        stroke="none"
-        transform={`
+const renderCircle =
+    ({
+        tickWidth,
+        translateX,
+        translateY,
+        angleOffset,
+        stepSize,
+        center,
+        color,
+        active,
+        activeColor,
+        activeClassName,
+        className,
+    }: RenderProps & { tickWidth: number }) =>
+    (_: any, i: number) =>
+        (
+            <circle
+                r={tickWidth}
+                key={i}
+                className={i === active ? activeClassName : className}
+                fill={i === active ? activeColor : color}
+                stroke="none"
+                transform={`
         rotate(${angleOffset + stepSize * i} ${center} ${center}) 
         translate(${translateX} ${translateY})
         `}
-    />
-)
+            />
+        );
 
-const renderRect = ({
-    tickWidth,
-    tickHeight,
-    translateX,
-    translateY,
-    angleOffset,
-    stepSize,
-    center,
-    color,
-    active,
-    activeColor,
-    activeClassName,
-    className,
-}: RenderProps & {tickWidth: number, tickHeight: number}) => (_: any, i: number) => (
-    <rect
-        className={i === active ? activeClassName : className}
-        fill={i === active ? activeColor : color}
-        stroke="none"
-        width={tickWidth}
-        height={tickHeight}
-        key={i}
-        transform={`
+const renderRect =
+    ({
+        tickWidth,
+        tickHeight,
+        translateX,
+        translateY,
+        angleOffset,
+        stepSize,
+        center,
+        color,
+        active,
+        activeColor,
+        activeClassName,
+        className,
+    }: RenderProps & { tickWidth: number; tickHeight: number }) =>
+    (_: any, i: number) =>
+        (
+            <rect
+                className={i === active ? activeClassName : className}
+                fill={i === active ? activeColor : color}
+                stroke="none"
+                width={tickWidth}
+                height={tickHeight}
+                key={i}
+                transform={`
         rotate(${angleOffset + stepSize * i} ${center} ${center}) 
         translate(${translateX} ${translateY})
         `}
-    />
-)
+            />
+        );
 
 export interface RenderCustomProps extends RenderProps {
-    i: number
+    i: number;
     tickWidth: number;
     tickHeight: number;
     steps: number;
     percentage: number;
 }
 
-const renderCustom = ({ fn, ...props }: {
-    fn: (props: RenderCustomProps) => void;
-    tickWidth: number;
-    tickHeight: number;
-    steps: number;
-    percentage: number;
-} & RenderProps) => (_: any, i: number) => fn({ ...props, i })
+const renderCustom =
+    ({
+        fn,
+        ...props
+    }: {
+        fn: (props: RenderCustomProps) => void;
+        tickWidth: number;
+        tickHeight: number;
+        steps: number;
+        percentage: number;
+    } & RenderProps) =>
+    (_: any, i: number) =>
+        fn({ ...props, i });
 
 interface Props {
     angleRange: number;
@@ -115,15 +126,15 @@ export const Scale = ({
     fn,
     percentage,
 }: PropsWithKnobState<Props>) => {
-    const stepSize = angleRange / steps
-    const length = steps + (angleRange === 360 ? 0 : 1)
-    const translateX = center - tickWidth / 2
-    const translateY = center - radius
+    const stepSize = angleRange / steps;
+    const length = steps + (angleRange === 360 ? 0 : 1);
+    const translateX = center - tickWidth / 2;
+    const translateY = center - radius;
     if (percentage === null) {
-        return <></>
+        return <></>;
     }
 
-    const active = Math.round((length - 1) * percentage)
+    const active = Math.round((length - 1) * percentage);
 
     function getRenderFn() {
         if (type === 'circle') {
@@ -159,7 +170,7 @@ export const Scale = ({
         }
         if (fn) {
             if (percentage === null) {
-                return <></>
+                return <></>;
             }
             return renderCustom({
                 fn,
@@ -176,13 +187,13 @@ export const Scale = ({
                 className,
                 activeClassName,
                 steps,
-                percentage
+                percentage,
             });
-      }
+        }
     }
 
     const renderFn = getRenderFn();
 
     // @ts-expect-error
-    return <g>{Array.from({ length }, renderFn)}</g>
-}
+    return <g>{Array.from({ length }, renderFn)}</g>;
+};

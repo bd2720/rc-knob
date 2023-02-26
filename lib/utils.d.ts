@@ -23,12 +23,12 @@ export declare const snapPosition: (position: Position, state: {
     angleRange: number;
 }, steps?: number) => Position;
 export declare const snapPercentage: (percentage: number, nbIntervals: number) => number;
-export declare const getValueFromPercentage: ({ min, max, percentage }: {
+export declare const getValueFromPercentage: ({ min, max, percentage, }: {
     min: number;
     max: number;
     percentage: number;
 }) => number;
-export declare const getPercentageFromValue: ({ min, max, value }: {
+export declare const getPercentageFromValue: ({ min, max, value, }: {
     min: number;
     max: number;
     value: number;
