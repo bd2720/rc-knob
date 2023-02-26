@@ -1,15 +1,46 @@
-import React from 'react'
-import useUpdate from './useUpdate'
-import { Arc } from './Arc'
-import { Pointer } from './Pointer'
-import { Scale } from './Scale'
-import { Value } from './Value'
-import { Range } from './Range'
-import { Spiral } from './Spiral'
-import { Label } from './Label'
+import React, { isValidElement, KeyboardEventHandler } from 'react';
+import useUpdate from './useUpdate';
+import { Arc } from './Arc';
+import { Pointer } from './Pointer';
+import { Scale } from './Scale';
+import { Value } from './Value';
+import { Range } from './Range';
+import { Spiral } from './Spiral';
+import { Label } from './Label';
+import type { InteractiveHook } from 'types';
 
-const isInternalComponent = ({ type }) =>
-    type === Arc || type === Pointer || type === Scale || type === Value || type === Range || type === Spiral || type === Label
+const isInternalComponent = ({ type }: { type: any }) =>
+    type === Arc ||
+    type === Pointer ||
+    type === Scale ||
+    type === Value ||
+    type === Range ||
+    type === Spiral ||
+    type === Label;
+
+interface Props {
+    min: number;
+    max: number;
+    initialValue?: number | null;
+    value?: number | null;
+    multiRotation?: boolean;
+    angleOffset?: number;
+    angleRange?: number;
+    size: number;
+    onChange?: (value: number) => void;
+    onInteractiveChange?: (value: number) => void;
+    interactiveHook?: InteractiveHook;
+    onStart?: () => void;
+    onEnd?: () => void;
+    steps?: number;
+    snap?: boolean;
+    tracking?: boolean;
+    readOnly?: boolean;
+    useMouseWheel?: boolean;
+    ariaValueText?: string;
+    ariaLabelledBy?: string;
+    className?: string;
+}
 
 export const Knob = ({
     min,
@@ -33,14 +64,8 @@ export const Knob = ({
     ariaValueText,
     ariaLabelledBy,
     className,
-}) => {
-    const {
-        percentage,
-        value,
-        svg,
-        container,
-        onKeyDown,
-    } = useUpdate({
+}: React.PropsWithChildren<Props>) => {
+    const { percentage, value, svg, container, onKeyDown } = useUpdate({
         min,
         max,
         multiRotation,
@@ -57,11 +82,12 @@ export const Knob = ({
         tracking,
         onStart,
         onEnd,
-    })
+    });
 
     return (
         <div
             ref={container}
+            // @ts-expect-error
             tabIndex="0"
             style={{ outline: 'none', width: size, height: size }}
             aria-valuemax={max}
@@ -69,12 +95,15 @@ export const Knob = ({
             aria-valuenow={value}
             aria-valuetext={ariaValueText}
             aria-labelledby={ariaLabelledBy}
-            onKeyDown={readOnly ? null : onKeyDown}
+            onKeyDown={readOnly ? undefined : onKeyDown}
             className={className}
         >
             <svg width={size} height={size} ref={svg}>
-                {React.Children.map(children, child =>
-                    isInternalComponent(child)
+                {React.Children.map(children, (child) => {
+                    if (!isValidElement(child)) {
+                        return child;
+                    }
+                    return isInternalComponent(child)
                         ? React.cloneElement(child, {
                               percentage,
                               size,
@@ -86,9 +115,9 @@ export const Knob = ({
                               steps,
                               ...child.props,
                           })
-                        : child
-                )}
+                        : child;
+                })}
             </svg>
         </div>
-    )
-}
+    );
+};

@@ -14,6 +14,8 @@ describe('Arc', () => {
                 radius={50}
                 color="lime"
                 background="red"
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()
@@ -29,6 +31,8 @@ describe('Arc', () => {
                 radius={50}
                 color="lime"
                 background="red"
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()

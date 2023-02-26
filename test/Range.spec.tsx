@@ -6,6 +6,7 @@ describe('Arc', () => {
     it('renders correct clockwise small', () => {
         const component = shallow(
             <Range
+                percentage={0}
                 percentageFrom={0.2}
                 percentageTo={0.5}
                 angleOffset={0}
@@ -14,7 +15,8 @@ describe('Arc', () => {
                 center={0}
                 radius={50}
                 color="lime"
-                background="red"
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()
@@ -22,6 +24,7 @@ describe('Arc', () => {
     it('renders correct clockwise large', () => {
         const component = shallow(
             <Range
+                percentage={0}
                 percentageFrom={0.2}
                 percentageTo={0.8}
                 angleOffset={0}
@@ -30,7 +33,8 @@ describe('Arc', () => {
                 center={0}
                 radius={50}
                 color="lime"
-                background="red"
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()
@@ -38,6 +42,7 @@ describe('Arc', () => {
     it('renders correct anticlockwise small', () => {
         const component = shallow(
             <Range
+                percentage={0}
                 percentageFrom={0.2}
                 percentageTo={0.5}
                 angleOffset={0}
@@ -46,7 +51,8 @@ describe('Arc', () => {
                 center={0}
                 radius={50}
                 color="lime"
-                background="red"
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()
@@ -54,6 +60,7 @@ describe('Arc', () => {
     it('renders correct anticlockwise large', () => {
         const component = shallow(
             <Range
+                percentage={0}
                 percentageFrom={0.2}
                 percentageTo={0.8}
                 angleOffset={0}
@@ -62,7 +69,8 @@ describe('Arc', () => {
                 center={0}
                 radius={50}
                 color="lime"
-                background="red"
+                value={0}
+                size={10}
             />
         )
         expect(component).toMatchSnapshot()

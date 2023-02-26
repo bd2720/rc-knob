@@ -10,6 +10,7 @@ describe('utils', () => {
     describe('calculatePositionFromMouseAngle', () => {
         it('when the new pos is inside the range ', () => {
             const result = calculatePositionFromMouseAngle({
+                percentage: 0,
                 mouseAngle: 45,
                 angleOffset: 0,
                 angleRange: 360,
@@ -20,6 +21,7 @@ describe('utils', () => {
         })
         it('when the new pos is inside outside range', () => {
             const result = calculatePositionFromMouseAngle({
+                percentage: 0,
                 mouseAngle: 135,
                 angleOffset: 0,
                 angleRange: 360,
@@ -30,6 +32,7 @@ describe('utils', () => {
         })
         it('when the new pos is on the other side with big angleOffset', () => {
             const result = calculatePositionFromMouseAngle({
+                percentage: 0,
                 mouseAngle: 90,
                 angleOffset: 270,
                 angleRange: 180,
@@ -40,6 +43,7 @@ describe('utils', () => {
         })
         it('when the new pos is far away from the previous angle ', () => {
             const result = calculatePositionFromMouseAngle({
+                percentage: 0,
                 mouseAngle: 0,
                 angleOffset: 0,
                 angleRange: 360,
@@ -50,6 +54,7 @@ describe('utils', () => {
         })
         it('when the position is closed but outside of the range', () => {
             const result = calculatePositionFromMouseAngle({
+                percentage: 0,
                 mouseAngle: 315,
                 angleOffset: 0,
                 angleRange: 360,
@@ -65,6 +70,7 @@ describe('utils', () => {
                 angleOffset: 0,
                 angleRange: 360,
                 percentage: -0.125,
+                previousPercentage: null,
                 previousMouseAngle: null,
             })
             expect(result).toEqual({updated: true, percentage: 0.125, mouseAngle: 45})
@@ -75,6 +81,7 @@ describe('utils', () => {
                 angleOffset: 0,
                 angleRange: 360,
                 percentage: 0.875,
+                previousPercentage: null,
                 previousMouseAngle: null,
             })
             expect(result).toEqual({updated: true, percentage: 0.875, mouseAngle: 315})
@@ -113,7 +120,7 @@ describe('utils', () => {
     })
 
     describe('calculatePercentageFromMouseAngle', () => {
-        const params = [
+        const params: [string, { mouseAngle: number, angleOffset: number, angleRange: number}, number][] = [
             ['easy', { mouseAngle: 180, angleOffset: 0, angleRange: 360 }, 0.5],
             ['clockwise center', { mouseAngle: 0, angleOffset: 220, angleRange: 280 }, 0.5],
             ['clockwise too small', { mouseAngle: 210, angleOffset: 220, angleRange: 280 }, 0],
@@ -135,7 +142,7 @@ describe('utils', () => {
 
     describe('snapPosition', () => {
         const state = { angleOffset: 0, angleRange: 360 }
-        const params = [
+        const params: [string, { position: {updated: boolean, percentage: number}, state: {angleOffset: number, angleRange: number}, steps:number}, number][] = [
             ['normal', { position: { updated: true, percentage: 0.56 }, state, steps: 4 }, 180],
             ['second turn', { position: { updated: true, percentage: 1.56 }, state, steps: 4 }, 180],
             ['negative turn', { position: { updated: true, percentage: -1.56 }, state, steps: 4 }, 180],
@@ -143,7 +150,7 @@ describe('utils', () => {
         params.forEach(param => {
             const [comment, {position, state, steps}, expected] = param
             it(comment, () => {
-                const result = snapPosition(position, state, steps)
+                const result = snapPosition({...position, mouseAngle:0}, state, steps)
                 expect(result.mouseAngle).toBeCloseTo(expected)
             })
         })
