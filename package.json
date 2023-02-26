@@ -1,6 +1,6 @@
 {
     "name": "rc-knob",
-    "version": "1.1.0-dev",
+    "version": "1.2.0",
     "description": "React component library to render knobs",
     "homepage": "https://eskimoblood.github.io/rc-knob/",
     "repository": {
