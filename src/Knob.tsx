@@ -1,4 +1,4 @@
-import React, { isValidElement, KeyboardEventHandler } from 'react';
+import React, { useState, useEffect, isValidElement } from 'react';
 import useUpdate from './useUpdate';
 import { Arc } from './Arc';
 import { Pointer } from './Pointer';
@@ -21,13 +21,13 @@ const isInternalComponent = ({ type }: { type: any }) =>
 interface Props {
     min: number;
     max: number;
-    initialValue?: number | null;
-    value?: number | null;
+    initialValue?: number | null; // For uncontrolled mode
+    value?: number | null; // For controlled mode
     multiRotation?: boolean;
     angleOffset?: number;
     angleRange?: number;
     size: number;
-    onChange?: (value: number) => void;
+    onChange?: (value: number) => void; // Required for controlled mode
     onInteractiveChange?: (value: number) => void;
     interactiveHook?: InteractiveHook;
     onStart?: () => void;
@@ -45,7 +45,8 @@ interface Props {
 export const Knob = ({
     min,
     max,
-    value: initialValue,
+    initialValue = null,
+    value: controlledValue = null,
     multiRotation = false,
     angleOffset = 0,
     angleRange = 360,
@@ -65,16 +66,40 @@ export const Knob = ({
     ariaLabelledBy,
     className,
 }: React.PropsWithChildren<Props>) => {
-    const { percentage, value, svg, container, onKeyDown } = useUpdate({
+    // Determine if the component is controlled
+    const isControlled = controlledValue !== null && controlledValue !== undefined;
+
+    // Internal state for uncontrolled mode
+    const [uncontrolledValue, setUncontrolledValue] = useState<number | null>(initialValue);
+
+    // Current value (controlled or uncontrolled)
+    const currentValue = isControlled ? controlledValue : uncontrolledValue;
+
+    // Update internal state when `initialValue` changes in uncontrolled mode
+    useEffect(() => {
+        if (!isControlled && initialValue !== null) {
+            setUncontrolledValue(initialValue);
+        }
+    }, [initialValue, isControlled]);
+
+    // Handle value changes
+    const handleChange = (newValue: number) => {
+        if (!isControlled) {
+            setUncontrolledValue(newValue); // Update internal state in uncontrolled mode
+        }
+        onChange(newValue); // Notify parent in both modes
+    };
+
+    const { percentage, svg, container, onKeyDown } = useUpdate({
         min,
         max,
+        value: currentValue, // Use the current value (controlled or uncontrolled)
         multiRotation,
-        initialValue,
         angleOffset,
         angleRange,
         size,
         steps: snap ? steps : undefined,
-        onChange,
+        onChange: handleChange,
         onInteractiveChange,
         interactiveHook,
         useMouseWheel,
@@ -87,12 +112,11 @@ export const Knob = ({
     return (
         <div
             ref={container}
-            // @ts-expect-error
-            tabIndex="0"
+            tabIndex={0}
             style={{ outline: 'none', width: size, height: size }}
             aria-valuemax={max}
             aria-valuemin={min}
-            aria-valuenow={value}
+            aria-valuenow={currentValue || 0}
             aria-valuetext={ariaValueText}
             aria-labelledby={ariaLabelledBy}
             onKeyDown={readOnly ? undefined : onKeyDown}
@@ -107,7 +131,7 @@ export const Knob = ({
                         ? React.cloneElement(child, {
                               percentage,
                               size,
-                              value,
+                              value: currentValue,
                               angleOffset,
                               angleRange,
                               radius: size / 2,

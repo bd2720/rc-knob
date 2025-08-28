@@ -32,6 +32,7 @@ interface InternalState {
 interface KnobConfiguration extends Callbacks {
     min: number;
     max: number;
+    value: number | null;
     multiRotation: boolean;
     initialValue?: number | null;
     angleOffset: number;
@@ -185,6 +186,12 @@ const reducer =
                 return reduceOnCancel(state, action, callbacks);
             case 'STEPS':
                 return reduceOnSteps(state, action, callbacks);
+            case 'SET_VALUE': // Handle external value updates
+                return {
+                    ...state,
+                    value: action.value ?? null,
+                    percentage: action.percentage ?? null,
+                };
             default:
                 return { ...state, isActive: false, value: state.value };
         }
@@ -195,6 +202,7 @@ export default ({
     max,
     multiRotation,
     initialValue,
+    value,
     angleOffset = 0,
     angleRange = 360,
     size,
@@ -216,7 +224,8 @@ export default ({
         onStart,
         onEnd,
     };
-    const [{ percentage, value }, dispatch] = useReducer(reducer(callbacks), {
+
+    const [{ percentage, value: internalValue }, dispatch] = useReducer(reducer(callbacks), {
         isActive: false,
         min,
         max,
@@ -233,6 +242,14 @@ export default ({
         steps,
     });
 
+    // Sync external value changes with internal state
+    useEffect(() => {
+        if (value !== null && value !== undefined) {
+            const newPercentage = getPercentageFromValue({ min, max, value });
+            dispatch({ type: 'SET_VALUE', value, percentage: newPercentage });
+        }
+    }, [value, min, max]);
+
     useEffect(
         handleEventListener({
             container,
@@ -248,7 +265,7 @@ export default ({
         svg,
         container,
         percentage: percentage,
-        value: value,
+        value: internalValue,
         onKeyDown: onKeyDown(dispatch),
     };
 };
