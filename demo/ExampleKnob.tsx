@@ -11,7 +11,7 @@ interface ExampleKnobProps {
 
 export const ExampleKnob = ({ label, value, onChange }: ExampleKnobProps) => {
   // adjust exact 0 to to correct position of knob
-  const fixedValue = value === 0 ? 0.000001 : value;
+  //const fixedValue = value === 0 ? 0.000001 : value;
   return (
     <div className="flex flex-col items-center">
       <p className="w-16 pb-2 pl-0.75 text-nowrap">{label}</p>
@@ -23,7 +23,7 @@ export const ExampleKnob = ({ label, value, onChange }: ExampleKnobProps) => {
         max={12}
         steps={24}
         snap
-        value={fixedValue}
+        value={value}
         onChange={onChange}
       >
         {/* If Knob.value is exactly zero, Pointer starts in the wrong place */}
