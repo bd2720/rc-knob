@@ -1,5 +1,5 @@
 {
-    "name": "rc-knob",
+    "name": "@bd2720/rc-knob",
     "version": "1.2.1",
     "description": "React component library to render knobs",
     "homepage": "https://eskimoblood.github.io/rc-knob/",
@@ -30,9 +30,6 @@
         "site:deploy": "gh-pages -d dist",
         "test": "jest",
         "dev": "vite"
-    },
-    "author": {
-        "name": "Andreas Köberle"
     },
     "license": "ISC",
     "peerDependencies": {
