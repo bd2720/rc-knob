@@ -16,6 +16,8 @@ export interface Action {
     type: string;
     direction?: number;
     steps?: number;
+    value?: number;
+    percentage?: number;
 }
 export interface Callbacks {
     onChange: (value: number) => void;

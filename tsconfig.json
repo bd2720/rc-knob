@@ -19,7 +19,6 @@
         "isolatedModules": true,
         "noEmit": true,
         "noFallthroughCasesInSwitch": true,
-        "verbatimModuleSyntax": true,
         "declaration": true
     },
     "include": ["./src/"]

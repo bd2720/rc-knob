@@ -23,5 +23,5 @@ interface Props {
     ariaLabelledBy?: string;
     className?: string;
 }
-export declare const Knob: ({ min, max, value: initialValue, multiRotation, angleOffset, angleRange, size, onChange, onInteractiveChange, interactiveHook, onStart, onEnd, children, steps, snap, tracking, readOnly, useMouseWheel, ariaValueText, ariaLabelledBy, className, }: React.PropsWithChildren<Props>) => JSX.Element;
+export declare const Knob: ({ min, max, initialValue, value: controlledValue, multiRotation, angleOffset, angleRange, size, onChange, onInteractiveChange, interactiveHook, onStart, onEnd, children, steps, snap, tracking, readOnly, useMouseWheel, ariaValueText, ariaLabelledBy, className, }: React.PropsWithChildren<Props>) => JSX.Element;
 export {};

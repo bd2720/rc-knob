@@ -3,6 +3,7 @@ import type { Callbacks } from 'types';
 interface KnobConfiguration extends Callbacks {
     min: number;
     max: number;
+    value: number | null;
     multiRotation: boolean;
     initialValue?: number | null;
     angleOffset: number;
@@ -13,7 +14,7 @@ interface KnobConfiguration extends Callbacks {
     tracking: boolean;
     useMouseWheel: boolean;
 }
-declare const _default: ({ min, max, multiRotation, initialValue, angleOffset, angleRange, size, steps, onChange, onInteractiveChange, interactiveHook, onStart, onEnd, readOnly, tracking, useMouseWheel, }: KnobConfiguration) => {
+declare const _default: ({ min, max, multiRotation, initialValue, value, angleOffset, angleRange, size, steps, onChange, onInteractiveChange, interactiveHook, onStart, onEnd, readOnly, tracking, useMouseWheel, }: KnobConfiguration) => {
     svg: import("react").RefObject<SVGSVGElement>;
     container: import("react").RefObject<HTMLDivElement>;
     percentage: number | null;
